@@ -7,7 +7,7 @@ cambio accidental en la matriz también se detecte.
 
 import pytest
 
-from app.permisos import ACCIONES, MATRIZ, RELACIONES, casos_matriz, puede
+from app.permisos import ACCIONES, MATRIZ, RELACIONES, _fila, casos_matriz, puede
 
 
 @pytest.mark.parametrize("rol, relacion, accion, permitido", list(casos_matriz()))
@@ -40,3 +40,21 @@ def test_celdas_centinela(rol, relacion, accion, esperado):
 ])
 def test_entradas_desconocidas_se_niegan(rol, relacion, accion):
     assert puede(rol, relacion, accion) is False
+
+
+def test_cada_fila_usa_exactamente_los_nombres_de_las_acciones():
+    # puede() hace fila.get(accion, False): si una clave quedara mal escrita
+    # ("VER" en vez de "ver"), el permiso se negaría en silencio y nadie lo
+    # notaría. mutmut lo mostró: esas mutaciones de _fila sobrevivían.
+    assert _fila(True, False, True, False) == {
+        "ver": True, "editar": False, "completar": True, "eliminar": False}
+    assert set(_fila(True, True, True, True)) == set(ACCIONES)
+
+
+def test_celda_faltante_en_la_matriz_se_niega(monkeypatch):
+    # Si alguien agrega un rol sin llenar todas sus relaciones, la regla debe
+    # fallar cerrada (negar), no abrir el permiso. Con la MATRIZ actual esa
+    # rama no se alcanza, por eso mutmut la marcó como sobreviviente.
+    monkeypatch.setitem(MATRIZ, "auditor", {"creada": _fila(True, False, False, False)})
+    assert puede("auditor", "creada", "ver") is True
+    assert puede("auditor", "ajena", "ver") is False
