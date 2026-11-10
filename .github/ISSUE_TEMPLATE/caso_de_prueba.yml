@@ -1,37 +1,53 @@
 name: Caso de prueba
 description: Registrar un caso de prueba (CP-XX) del plan
 title: "CP-XX: "
-labels: ["caso-de-prueba"]
+labels: ["tipo:caso-prueba"]
 body:
   - type: input
-    id: archivo
+    id: id
     attributes:
-      label: Archivo de prueba
-      placeholder: tests/integracion/test_filtros.py
+      label: ID
+      placeholder: CP-06
     validations:
       required: true
   - type: dropdown
-    id: nivel
-    attributes:
-      label: Nivel
-      options: [Unitaria, Integración, E2E, Mutación]
-    validations:
-      required: true
-  - type: input
     id: tecnica
     attributes:
       label: Técnica
-      placeholder: Valores límite / Transición de estados / Tabla de decisión
-  - type: textarea
-    id: requisito
+      options:
+        - Valores límite
+        - Tabla de decisión
+        - Transición de estados
+        - Integración
+        - Exploratoria / manual
+        - Aceptación
+    validations:
+      required: true
+  - type: input
+    id: automatizacion
     attributes:
-      label: Requisito que verifica
+      label: Prueba automatizada
+      description: Archivo de pytest que lo cubre, o "manual"
+      placeholder: tests/integracion/test_filtros.py
+  - type: textarea
+    id: precondicion
+    attributes:
+      label: Precondición
     validations:
       required: true
   - type: textarea
-    id: criterio
+    id: pasos
     attributes:
-      label: Criterio de aceptación
-      description: Qué tiene que pasar para darlo por bueno
+      label: Pasos
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Resultado esperado
     validations:
       required: true
