@@ -15,8 +15,15 @@
 | `main` después del merge | `ce29ceb` | 168 | 0 | ✅ [run #5](https://github.com/Jeisson-Esteban/gestion-tareas-plasticos/actions/runs/42748921730) |
 | Pruebas reforzadas por mutación | este PR | 178 | 0 | — |
 
-E2E (CP-09): pasa en local con Chrome headless (1 prueba, entre 8 y 14 s), tanto levantando su
-propia app como contra una app ya levantada (`E2E_URL`), que es el modo del job nocturno.
+E2E (CP-09) en CI, con la app levantada en segundo plano (`E2E_URL`):
+
+| Run | Rama | Resultado | Causa |
+|---|---|---|---|
+| [42750355016](https://github.com/Jeisson-Esteban/gestion-tareas-plasticos/actions/runs/42750355016) | `main` | ❌ | `stale element reference`: tras pulsar "Filtrar", la prueba leía la página vieja. En local pasaba. Defecto de la prueba, no de la app |
+| [42750733507](https://github.com/Jeisson-Esteban/gestion-tareas-plasticos/actions/runs/42750733507) | `pruebas/mutacion-y-evidencia` | ✅ 21 s | Cada clic espera a que la página anterior desaparezca (`EC.staleness_of`) |
+
+Job `mutacion` en CI: 40 sobrevivientes sobre `main` (run 42750355016) y 1 sobreviviente con
+las pruebas reforzadas (run 42750733507), igual que en WSL.
 
 ## Cobertura (`pytest -m "not e2e" --cov=app`)
 
