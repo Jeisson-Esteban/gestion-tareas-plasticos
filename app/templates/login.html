@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Ingresar · Gestión de tareas</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 360px; margin: 4rem auto; padding: 0 1rem; }
+    label, input, button { display: block; width: 100%; margin-bottom: .6rem; }
+    input, button { padding: .5rem; box-sizing: border-box; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Gestión de tareas</h1>
+  {% if error %}<p class="error" data-testid="login-error">{{ error }}</p>{% endif %}
+  <form method="post" action="{{ url_for('web.login') }}" data-testid="login-form">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" required data-testid="login-email">
+    <label for="contrasena">Contraseña</label>
+    <input id="contrasena" name="contrasena" type="password" required data-testid="login-contrasena">
+    <button type="submit" data-testid="login-enviar">Ingresar</button>
+  </form>
+</body>
+</html>

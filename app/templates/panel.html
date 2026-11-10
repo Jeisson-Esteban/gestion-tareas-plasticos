@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Panel · Gestión de tareas</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+    header { display: flex; justify-content: space-between; align-items: center; }
+    form.linea { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0; }
+    input, select, button { padding: .4rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #ddd; padding: .4rem; text-align: left; }
+    .ok { color: #1b5e20; } .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tareas</h1>
+    <div>
+      <span data-testid="usuario-actual">{{ usuario.nombre }} ({{ usuario.rol }})</span>
+      <form method="post" action="{{ url_for('web.logout') }}" style="display:inline">
+        <button type="submit" data-testid="logout">Salir</button>
+      </form>
+    </div>
+  </header>
+
+  {% for categoria, mensaje in get_flashed_messages(with_categories=true) %}
+    <p class="{{ categoria }}" data-testid="mensaje">{{ mensaje }}</p>
+  {% endfor %}
+
+  <form class="linea" method="get" action="{{ url_for('web.panel') }}" data-testid="form-filtro">
+    <select name="estado" data-testid="filtro-estado">
+      {% for valor, texto in [('', 'Todas'), ('pendientes', 'Pendientes'), ('en_progreso', 'En progreso'), ('completada', 'Completadas')] %}
+        <option value="{{ valor }}" {% if valor == estado %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    </select>
+    <input name="q" value="{{ q }}" placeholder="Buscar..." data-testid="filtro-busqueda">
+    <button type="submit" data-testid="filtro-aplicar">Filtrar</button>
+  </form>
+
+  <table data-testid="tabla-tareas">
+    <thead><tr><th>Título</th><th>Estado</th><th>Fecha límite</th><th>Asignado a</th><th></th></tr></thead>
+    <tbody>
+    {% for t in tareas %}
+      <tr data-testid="tarea" data-id="{{ t.id }}">
+        <td data-testid="tarea-titulo">{{ t.titulo }}</td>
+        <td data-testid="tarea-estado">{{ t.estado }}</td>
+        <td>{{ t.fecha_limite }}</td>
+        <td>{{ nombres.get(t.asignado_id, '?') }}</td>
+        <td>
+          {% if t.puede_completar %}
+          <form method="post" action="{{ url_for('web.completar_tarea', tarea_id=t.id) }}">
+            <button type="submit" data-testid="btn-completar">Completar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" data-testid="sin-tareas">No hay tareas.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>Nueva tarea</h2>
+  <form class="linea" method="post" action="{{ url_for('web.crear_tarea') }}" data-testid="form-crear">
+    <input name="titulo" placeholder="Título" required maxlength="200" data-testid="crear-titulo">
+    <input name="descripcion" placeholder="Descripción (opcional)" data-testid="crear-descripcion">
+    <input name="fecha_limite" type="date" value="{{ hoy }}" min="{{ hoy }}" required data-testid="crear-fecha">
+    <select name="asignado_id" data-testid="crear-asignado">
+      {% for u in usuarios %}
+        <option value="{{ u.id }}" {% if u.id == usuario.id %}selected{% endif %}>{{ u.nombre }} ({{ u.rol }})</option>
+      {% endfor %}
+    </select>
+    <button type="submit" data-testid="crear-enviar">Crear</button>
+  </form>
+</body>
+</html>
