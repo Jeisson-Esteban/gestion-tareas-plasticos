@@ -1,0 +1,12 @@
+[project]
+name = "gestion-tareas-plasticos"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.mutmut]
+source_paths = ["app/permisos.py", "app/servicios.py"]
+also_copy = ["app/", "tests/", "pytest.ini"]
+pytest_add_cli_args = ["-m", "not e2e", "-p", "no:cacheprovider"]
+
+[tool.coverage.run]
+source = ["app"]
