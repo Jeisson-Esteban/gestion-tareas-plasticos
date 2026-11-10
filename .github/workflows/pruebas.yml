@@ -1,0 +1,62 @@
+name: pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 7 * * *"   # e2e nocturno: 2:00 a. m. hora de Colombia
+    - cron: "0 6 * * 1"   # mutación semanal: lunes 1:00 a. m. hora de Colombia
+  workflow_dispatch:
+
+jobs:
+  rapidas:
+    # Unitarias + integración + cobertura. Es el check obligatorio de main.
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pytest -m "not e2e" --cov=app --cov-report=term-missing --cov-fail-under=80
+
+  e2e:
+    # Selenium es lento y frágil: corre de noche para no frenar cada PR.
+    if: github.event.schedule == '0 7 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest   # trae Chrome instalado; Selenium Manager baja el driver
+    env:
+      E2E_URL: http://127.0.0.1:5000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Levantar la app en segundo plano
+        run: |
+          flask --app app sembrar
+          flask --app app run --port 5000 > flask.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf "$E2E_URL/login" > /dev/null && exit 0; sleep 1; done
+          cat flask.log; exit 1
+      - run: pytest -m e2e -v
+
+  mutacion:
+    if: github.event.schedule == '0 6 * * 1' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: mutmut run || true
+      - run: mutmut results | tee mutmut-resultados.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mutmut-resultados
+          path: mutmut-resultados.txt
