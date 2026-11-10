@@ -9,6 +9,7 @@ from datetime import date, timedelta
 import pytest
 
 from app.servicios import (
+    normalizar_email,
     validar_contrasena,
     validar_email,
     validar_fecha_limite,
@@ -74,9 +75,27 @@ def test_registro_valido_no_tiene_errores():
     assert validar_registro({"email": "A@B.co ", "contrasena": "abcd1234", "nombre": "Ana"}) == {}
 
 
+# Se compara el dict completo y no solo sus claves: mutmut mostró que
+# `errores["email"] = None` sobrevivía porque la clave seguía ahí. La API
+# devuelve estos textos en "detalles", así que el mensaje también es requisito.
 def test_registro_reporta_cada_campo_invalido():
     errores = validar_registro({"email": "x", "contrasena": "corta", "nombre": "  "})
-    assert set(errores) == {"email", "contrasena", "nombre"}
+    assert errores == {
+        "email": "Email inválido",
+        "contrasena": "La contraseña debe tener al menos 8 caracteres",
+        "nombre": "El nombre es obligatorio",
+    }
+
+
+def test_registro_sin_campos_reporta_email_y_nombre():
+    # Sin "nombre" en absoluto (no solo vacío): cubre el `or ""` del servicio.
+    errores = validar_registro({"contrasena": "abcd1234"})
+    assert errores == {"email": "Email inválido", "nombre": "El nombre es obligatorio"}
+
+
+def test_normalizar_email_vacio_da_texto_vacio():
+    assert normalizar_email(None) == ""
+    assert normalizar_email("  Ana@Planta.CO ") == "ana@planta.co"
 
 
 def test_tarea_nueva_valida():
@@ -86,4 +105,24 @@ def test_tarea_nueva_valida():
 
 def test_tarea_nueva_reporta_cada_campo_invalido():
     datos = {"titulo": "", "fecha_limite": "2020-01-01", "asignado_id": "x"}
-    assert set(validar_tarea_nueva(datos, HOY)) == {"titulo", "fecha_limite", "asignado_id"}
+    assert validar_tarea_nueva(datos, HOY) == {
+        "titulo": "El título es obligatorio",
+        "fecha_limite": "La fecha límite no puede ser anterior a hoy",
+        "asignado_id": "Debe indicar un usuario asignado válido",
+    }
+
+
+# Mensajes exactos que ve el usuario. Las pruebas de valores límite (CP-01 a
+# CP-03) solo miraban si había error; con eso sobrevivían mutantes que
+# cambiaban el texto por "XX...XX" o lo pasaban a mayúsculas.
+@pytest.mark.parametrize("error, esperado", [
+    (lambda: validar_titulo("   "), "El título es obligatorio"),                               # CP-01
+    (lambda: validar_fecha_limite("09/11/2026", HOY), "Fecha inválida, use el formato AAAA-MM-DD"),  # CP-02
+    (lambda: validar_fecha_limite(HOY - timedelta(days=1), HOY),
+     "La fecha límite no puede ser anterior a hoy"),                                            # CP-02
+    (lambda: validar_contrasena("abcdefgh"),
+     "La contraseña debe tener al menos una letra y un número"),                                # CP-03
+    (lambda: validar_email("ana@planta"), "Email inválido"),
+], ids=["titulo", "fecha-formato", "fecha-pasada", "contrasena-composicion", "email"])
+def test_mensajes_de_error_exactos(error, esperado):
+    assert error() == esperado

@@ -68,11 +68,23 @@ def _el(driver, testid):
         EC.presence_of_element_located((By.CSS_SELECTOR, f'[data-testid="{testid}"]')))
 
 
+def _enviar(driver, elemento):
+    """Hace clic y espera a que la página anterior desaparezca.
+
+    Sin esta espera la prueba pasaba en local y fallaba en CI con
+    "stale element reference": buscaba las filas en la página vieja,
+    antes de que terminara la recarga (run 42750355016).
+    """
+    pagina_anterior = driver.find_element(By.TAG_NAME, "html")
+    elemento.click()
+    WebDriverWait(driver, 10).until(EC.staleness_of(pagina_anterior))
+
+
 def _iniciar_sesion(driver, base, email):
     driver.get(f"{base}/login")
     _el(driver, "login-email").send_keys(email)
     _el(driver, "login-contrasena").send_keys(CLAVE)
-    _el(driver, "login-enviar").click()
+    _enviar(driver, _el(driver, "login-enviar"))
     _el(driver, "tabla-tareas")
 
 
@@ -96,18 +108,22 @@ def test_supervisor_asigna_y_operario_completa(servidor, navegador):
     _iniciar_sesion(navegador, base, SUPERVISOR)
     _el(navegador, "crear-titulo").send_keys(titulo)
     Select(_el(navegador, "crear-asignado")).select_by_visible_text("Olga Operaria (operario)")
-    _el(navegador, "crear-enviar").click()
+    _enviar(navegador, _el(navegador, "crear-enviar"))
     assert _el(navegador, "mensaje").text == "Tarea creada"
     assert _estado(_fila(navegador, titulo)) == "pendiente"
-    _el(navegador, "logout").click()
+    _enviar(navegador, _el(navegador, "logout"))
 
     # 2. El operario la ve en su panel y la completa
     _iniciar_sesion(navegador, base, OPERARIO)
-    _fila(navegador, titulo).find_element(By.CSS_SELECTOR, '[data-testid="btn-completar"]').click()
+    _enviar(navegador, _fila(navegador, titulo).find_element(
+        By.CSS_SELECTOR, '[data-testid="btn-completar"]'))
     assert _el(navegador, "mensaje").text == "Tarea completada"
     assert _estado(_fila(navegador, titulo)) == "completada"
+    # Evidencia para la ponencia: E2E_CAPTURA=ruta.png guarda el panel en este punto
+    if os.environ.get("E2E_CAPTURA"):
+        navegador.save_screenshot(os.environ["E2E_CAPTURA"])
 
     # 3. El filtro de completadas la muestra
     Select(_el(navegador, "filtro-estado")).select_by_value("completada")
-    _el(navegador, "filtro-aplicar").click()
+    _enviar(navegador, _el(navegador, "filtro-aplicar"))
     assert _estado(_fila(navegador, titulo)) == "completada"
