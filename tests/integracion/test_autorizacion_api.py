@@ -1,7 +1,7 @@
 """CP-04 · Tabla de decisión (nivel integración).
 
 La misma MATRIZ de app/permisos.py, ahora por HTTP con usuarios reales y
-SQLite temporal. Si la unitaria (CP-03) pasa y esta falla, el error está en
+SQLite temporal. Si la unitaria (test_permisos.py) pasa y esta falla, el error está en
 cómo la API calcula la relación o aplica el permiso, no en la tabla.
 """
 
@@ -94,7 +94,7 @@ def test_logout_cierra_la_sesion(preparar_escenario):
     assert c.get("/api/tareas").status_code == 401
 
 
-# ---------- Reglas de estado expuestas por la API ----------
+# ---------- CP-05: reabrir y reasignar, vistos desde la API ----------
 
 def test_reabrir_solo_creador_o_admin(preparar_escenario):
     esc = preparar_escenario

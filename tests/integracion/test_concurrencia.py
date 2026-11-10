@@ -1,4 +1,4 @@
-"""CP-06 · Bloqueo optimista.
+"""CP-07 · Edición simultánea (bloqueo optimista).
 
 Dos personas leen la misma versión y ambas guardan. Sin el control de
 versión, la segunda pisaría en silencio el trabajo de la primera.

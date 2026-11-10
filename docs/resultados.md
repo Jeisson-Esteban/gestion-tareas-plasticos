@@ -8,10 +8,10 @@
 
 | Fecha | Commit | Pasan | Fallan | Notas |
 |---|---|---|---|---|
-| 2026-11-09 | (primer push) | 165 | 2 | Fallan las dos pruebas de CP-05 por DEF-01 (esperado) |
+| 2026-11-09 | (primer push) | 165 | 2 | Fallan las dos pruebas de CP-06 por DEF-01 (esperado) |
 | | (PR de la corrección) | | | |
 
-E2E (CP-08): pasa en local con Chrome headless (1 prueba, ~14 s).
+E2E (CP-09): pasa en local con Chrome headless (1 prueba, ~14 s).
 
 ## Cobertura (`pytest -m "not e2e" --cov=app`)
 
@@ -52,4 +52,4 @@ Que una línea se ejecute no significa que alguna prueba verifique su resultado.
 
 | ID | Descripción | Detectado por | Issue | PR | Estado |
 |---|---|---|---|---|---|
-| DEF-01 | `estado=pendientes` omite las tareas `en_progreso` | CP-05 (`test_filtros.py`) | #? | #? | Abierto |
+| DEF-01 | `estado=pendientes` omite las tareas `en_progreso` | CP-06 (`test_filtros.py`) | #? | #? | Abierto |

@@ -19,17 +19,20 @@ mutación registrado antes y después de reforzar las pruebas.
 
 ## Casos de prueba
 
-| ID | Archivo | Qué cubre | Técnica |
+| ID | Caso | Técnica | Cómo se ejecuta |
 |---|---|---|---|
-| CP-01 | `unit/test_validaciones.py` | Título (0, 1, 200, 201, espacios), fecha (ayer, hoy, mañana), contraseña (7, 8) | Valores límite |
-| CP-02 | `unit/test_transiciones.py` | Los 9 pares de estados, reabrir y reasignar | Transición de estados |
-| CP-03 | `unit/test_permisos.py` | `puede()` contra las 36 celdas de la matriz | Tabla de decisión |
-| CP-04 | `integracion/test_autorizacion_api.py` | La misma matriz por HTTP; 401 sin sesión; registro y login | Tabla de decisión |
-| CP-05 | `integracion/test_filtros.py` | Estado + búsqueda combinados | Integración |
-| CP-06 | `integracion/test_concurrencia.py` | Dos lecturas de la versión 1; la segunda escritura recibe 409 | Integración |
-| CP-07 | `integracion/test_perfil.py` | Cambio de contraseña; la anterior deja de servir | Integración |
-| CP-08 | `e2e/test_flujo_supervisor.py` | El supervisor crea y asigna; el operario completa | E2E |
-| CP-09 | `pyproject.toml` (`[tool.mutmut]`) | Mutantes eliminados en permisos y servicios | Mutación |
+| CP-01 | Título: 0, 1, 200, 201 caracteres y solo espacios | Valores límite | `unit/test_validaciones.py` |
+| CP-02 | Fecha límite: ayer, hoy, mañana | Valores límite | `unit/test_validaciones.py` |
+| CP-03 | Contraseña: 7 y 8 caracteres, sin letra, sin número | Valores límite | `unit/test_validaciones.py`, `integracion/test_perfil.py` |
+| CP-04 | Matriz de autorización (3 roles × 3 relaciones × 4 acciones) | Tabla de decisión | `unit/test_permisos.py` y la misma matriz por HTTP en `integracion/test_autorizacion_api.py` |
+| CP-05 | Reabrir y reasignar una tarea completada | Transición de estados | `unit/test_transiciones.py`, `integracion/test_autorizacion_api.py` |
+| CP-06 | Filtro por estado + búsqueda por texto | Integración | `integracion/test_filtros.py` |
+| CP-07 | Edición simultánea: la segunda escritura recibe 409 | Integración | `integracion/test_concurrencia.py` |
+| CP-08 | Usabilidad del panel en celular | Exploratoria / manual | Manual, en un teléfono o con las herramientas de desarrollo del navegador |
+| CP-09 | Asignación al cambio de turno: el supervisor asigna y el operario completa | Aceptación | Parte automatizada en `e2e/test_flujo_supervisor.py`; la validación final la hace el usuario |
+
+La calidad de las pruebas de CP-01 a CP-05 se mide además con pruebas de mutación (mutmut) sobre
+`permisos.py` y `servicios.py`.
 
 ## Decisiones de diseño que facilitan las pruebas
 
@@ -46,5 +49,5 @@ mutación registrado antes y después de reforzar las pruebas.
 ## Defecto sembrado (DEF-01)
 
 `estado=pendientes` debería devolver las tareas `pendiente` y `en_progreso`, pero devuelve solo
-`pendiente` (`servicios.filtrar_tareas`). Lo detectan dos pruebas de CP-05. Ciclo:
+`pendiente` (`servicios.filtrar_tareas`). Lo detectan dos pruebas de CP-06. Ciclo:
 prueba roja → issue con la plantilla *Defecto* → PR con `Fixes #N` → check en verde → merge.

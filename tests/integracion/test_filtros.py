@@ -1,4 +1,4 @@
-"""CP-05 · Filtros por estado y búsqueda combinados (detecta DEF-01).
+"""CP-06 · Filtros por estado y búsqueda combinados (detecta DEF-01).
 
 "pendientes" significa todo lo que aún no está completado (pendiente y
 en_progreso). Si el filtro deja fuera una tarea en progreso, el operario

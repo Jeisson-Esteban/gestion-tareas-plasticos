@@ -1,4 +1,4 @@
-"""CP-02 · Transición de estados.
+"""CP-05 · Transición de estados (reabrir y reasignar una tarea completada).
 
 Se prueban los 9 pares posibles y no solo los permitidos: el riesgo real es
 que una transición prohibida (completada -> pendiente sin reabrir) pase.

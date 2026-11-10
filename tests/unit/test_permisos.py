@@ -1,4 +1,4 @@
-"""CP-03 · Tabla de decisión (nivel unitario).
+"""CP-04 · Tabla de decisión (nivel unitario).
 
 Los casos salen de la misma MATRIZ que usa la app: la tabla es requisito y
 prueba a la vez. Las celdas "centinela" están escritas a mano para que un

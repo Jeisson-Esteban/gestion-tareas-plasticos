@@ -1,4 +1,8 @@
-"""CP-07 · Cambio de contraseña: exige la actual y la anterior deja de servir."""
+"""Cambio de contraseña: exige la actual y la anterior deja de servir.
+
+Complementa CP-03: la regla de contraseña también se aplica al cambiarla,
+no solo al registrarse.
+"""
 
 from tests.conftest import CLAVE, USUARIOS
 

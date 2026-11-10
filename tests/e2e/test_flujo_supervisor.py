@@ -1,4 +1,6 @@
-"""CP-08 · E2E: el supervisor crea y asigna una tarea, el operario la completa.
+"""CP-09 (aceptación, parte automatizada) · E2E del cambio de turno.
+
+El supervisor crea y asigna una tarea, y el operario del turno la completa.
 
 Los selectores usan data-testid para que un cambio de diseño (clases, textos,
 estructura) no rompa la prueba: es la mitigación de la fragilidad de Selenium.

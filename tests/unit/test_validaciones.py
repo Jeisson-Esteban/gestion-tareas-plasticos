@@ -1,4 +1,4 @@
-"""CP-01 · Valores límite.
+"""CP-01 (título), CP-02 (fecha límite) y CP-03 (contraseña) · Valores límite.
 
 Los defectos se concentran en los bordes (>= contra >, strip antes o después
 de medir), así que se prueba justo a cada lado de cada límite.
@@ -20,6 +20,7 @@ from app.servicios import (
 HOY = date(2026, 11, 9)
 
 
+# CP-01
 @pytest.mark.parametrize("titulo, valido", [
     ("", False),                        # 0 caracteres
     ("a", True),                        # 1 (mínimo)
@@ -33,6 +34,7 @@ def test_titulo(titulo, valido):
     assert (validar_titulo(titulo) is None) == valido
 
 
+# CP-02: HOY es fijo para que el resultado no dependa del día en que corra la prueba
 @pytest.mark.parametrize("fecha, valida", [
     (HOY - timedelta(days=1), False),   # ayer
     (HOY, True),                        # hoy
@@ -45,6 +47,7 @@ def test_fecha_limite(fecha, valida):
     assert (validar_fecha_limite(fecha, HOY) is None) == valida
 
 
+# CP-03
 @pytest.mark.parametrize("contrasena, valida", [
     ("abc1234", False),     # 7 caracteres
     ("abcd1234", True),     # 8 caracteres
