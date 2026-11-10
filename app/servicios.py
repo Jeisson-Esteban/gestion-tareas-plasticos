@@ -145,7 +145,7 @@ def filtrar_tareas(tareas, estado=None, q=None):
     resultado = list(tareas)
     if estado == "pendientes":
         # "pendientes" = todo lo que todavía no está completado
-        resultado = [t for t in resultado if t["estado"] in ("pendiente", "en_progreso")]
+        resultado = [t for t in resultado if t["estado"] == "pendiente"]
     elif estado:
         resultado = [t for t in resultado if t["estado"] == estado]
     if q and q.strip():
