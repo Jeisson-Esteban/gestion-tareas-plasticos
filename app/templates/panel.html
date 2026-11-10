@@ -2,10 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
+  <!-- CP-08: sin viewport el panel se ve diminuto en el celular del operario -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Panel · Gestión de tareas</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
-    header { display: flex; justify-content: space-between; align-items: center; }
+    header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; }
+    .tabla { overflow-x: auto; }
+    button { min-height: 2.5rem; }
     form.linea { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0; }
     input, select, button { padding: .4rem; }
     table { width: 100%; border-collapse: collapse; }
@@ -38,6 +42,7 @@
     <button type="submit" data-testid="filtro-aplicar">Filtrar</button>
   </form>
 
+  <div class="tabla">
   <table data-testid="tabla-tareas">
     <thead><tr><th>Título</th><th>Estado</th><th>Fecha límite</th><th>Asignado a</th><th></th></tr></thead>
     <tbody>
@@ -60,6 +65,7 @@
     {% endfor %}
     </tbody>
   </table>
+  </div>
 
   <h2>Nueva tarea</h2>
   <form class="linea" method="post" action="{{ url_for('web.crear_tarea') }}" data-testid="form-crear">
